@@ -3,6 +3,9 @@
 #include <array>
 #include <random>
 #include <cmath>
+#include <cstdlib> 
+#include <ctime>
+#include <locale>
 
 using namespace std;
 
@@ -117,127 +120,187 @@ void processVariant5(vector<int>& arr) {
     printArray(arr);
 }
 
-// ===== ПУНКТ 2: РАБОТА С ARRAY (БЕЗ VECTOR И СТРУКТУР) =====
+// ===== ПУНКТ 2: РАБОТА С ARRAY  =====
 
-const size_t ARRAY_SIZE = 10;
 
-// Функция удаления чётных чисел (передача по значению) - возвращаем новый array
-array<int, ARRAY_SIZE> removeEvenByValue(array<int, ARRAY_SIZE> arr) {
-    array<int, ARRAY_SIZE> result = {};
-    size_t resultIndex = 0;
+using namespace std;
 
-    for (size_t i = 0; i < ARRAY_SIZE; ++i) {
-        if (arr[i] % 2 != 0) { // нечётное число
-            result[resultIndex] = arr[i];
-            resultIndex++;
-        }
+// Константа для размера массива
+const int SIZE = 10;
+
+// Генерация случайного std::array через rand()
+array<int, SIZE> generateRandomArray(int min, int max) {
+    array<int, SIZE> arr;
+    
+    // Инициализация генератора случайных чисел
+    srand(time(0));
+    
+    for (int i = 0; i < SIZE; i++) {
+        // Генерируем число от min до max включительно
+        arr[i] = rand() % (max - min + 1) + min;
     }
-
-    cout << "In function (by value): ";
-    for (size_t i = 0; i < resultIndex; ++i) {
-        cout << result[i] << " ";
-    }
-    cout << endl;
-
-    return result;
+    return arr;
 }
 
-// Функция удаления чётных чисел (передача по ссылке) - возвращаем новый array
-array<int, ARRAY_SIZE> removeEvenByReference(const array<int, ARRAY_SIZE>& arr) {
-    array<int, ARRAY_SIZE> result = {};
-    size_t resultIndex = 0;
-
-    for (size_t i = 0; i < ARRAY_SIZE; ++i) {
-        if (arr[i] % 2 != 0) { // нечётное число
-            result[resultIndex] = arr[i];
-            resultIndex++;
-        }
-    }
-
-    cout << "In function (by reference): ";
-    for (size_t i = 0; i < resultIndex; ++i) {
-        cout << result[i] << " ";
-    }
-    cout << endl;
-
-    return result;
-}
-
-// Функция удаления чётных чисел (передача по указателю) - возвращаем новый array
-array<int, ARRAY_SIZE> removeEvenByPointer(const array<int, ARRAY_SIZE>* arrPtr) {
-    array<int, ARRAY_SIZE> result = {};
-    size_t resultIndex = 0;
-
-    for (size_t i = 0; i < ARRAY_SIZE; ++i) {
-        if ((*arrPtr)[i] % 2 != 0) { // нечётное число
-            result[resultIndex] = (*arrPtr)[i];
-            resultIndex++;
-        }
-    }
-
-    cout << "In function (by pointer): ";
-    for (size_t i = 0; i < resultIndex; ++i) {
-        cout << result[i] << " ";
-    }
-    cout << endl;
-
-    return result;
-}
-
-// Функция in-place удаления чётных чисел (возвращает новый размер)
-size_t removeEvenInPlace(array<int, ARRAY_SIZE>& arr) {
-    size_t writeIndex = 0;
-
-    for (size_t readIndex = 0; readIndex < ARRAY_SIZE; ++readIndex) {
-        if (arr[readIndex] % 2 != 0) { // нечётное число
-            arr[writeIndex] = arr[readIndex];
-            writeIndex++;
-        }
-    }
-
-    // Заполняем оставшиеся элементы специальным значением (например, 0)
-    for (size_t i = writeIndex; i < ARRAY_SIZE; ++i) {
-        arr[i] = 0;
-    }
-
-    return writeIndex; // возвращаем новый размер
-}
-
-// Функция вывода array
-void printStdArray(const array<int, ARRAY_SIZE>& arr) {
-    cout << "[";
-    for (size_t i = 0; i < ARRAY_SIZE; ++i) {
+// Вывод std::array
+void printArray(const array<int, SIZE>& arr, const string& message = "") {
+    if (!message.empty()) cout << message;
+    for (int i = 0; i < SIZE; i++) {
         cout << arr[i];
-        if (i < ARRAY_SIZE - 1) cout << " ";
+        if (i < SIZE - 1) cout << ", ";
     }
-    cout << "]" << endl;
+    cout << endl;
 }
 
-// Функция вывода array только с значимыми элементами
-void printStdArrayMeaningful(const array<int, ARRAY_SIZE>& arr) {
-    cout << "[";
-    bool first = true;
-    for (size_t i = 0; i < ARRAY_SIZE; ++i) {
-        if (arr[i] != 0) { // считаем 0 как пустой элемент
-            if (!first) cout << " ";
-            cout << arr[i];
-            first = false;
+// Пузырьковая сортировка по возрастанию
+void bubbleSortAsc(array<int, SIZE>& arr, int start, int end) {
+    for (int i = start; i < end; i++) {
+        for (int j = start; j < end - (i - start) - 1; j++) {
+            if (arr[j] > arr[j + 1]) {
+                swap(arr[j], arr[j + 1]);
+            }
         }
     }
-    cout << "]" << endl;
 }
 
-// Функция вывода array с указанием размера
-void printStdArrayWithSize(const array<int, ARRAY_SIZE>& arr, size_t size) {
-    cout << "[";
-    for (size_t i = 0; i < size; ++i) {
-        cout << arr[i];
-        if (i < size - 1) cout << " ";
+// Пузырьковая сортировка по убыванию
+void bubbleSortDesc(array<int, SIZE>& arr, int start, int end) {
+    for (int i = start; i < end; i++) {
+        for (int j = start; j < end - (i - start) - 1; j++) {
+            if (arr[j] < arr[j + 1]) {  // Обратное сравнение для убывания
+                swap(arr[j], arr[j + 1]);
+            }
+        }
     }
-    cout << "]" << endl;
 }
+
+// 1. ПЕРЕДАЧА ПО ЗНАЧЕНИЮ
+array<int, SIZE> sortHalfAscHalfDescByValue(array<int, SIZE> arr) {
+    cout << "Адрес ВНУТРИ функции (значение): " << &arr << endl;
+    
+    int mid = SIZE / 2;
+    
+    // Первую половину сортируем по ВОЗРАСТАНИЮ (пузырьковая)
+    bubbleSortAsc(arr, 0, mid);
+    
+    // Вторую половину сортируем по УБЫВАНИЮ (пузырьковая)
+    bubbleSortDesc(arr, mid, SIZE);
+    
+    return arr;
+}
+
+// 2. ПЕРЕДАЧА ПО ССЫЛКЕ
+void sortHalfAscHalfDescByReference(array<int, SIZE>& arr) {
+    cout << "Адрес ВНУТРИ функции (ссылка): " << &arr << endl;
+    
+    int mid = SIZE / 2;
+    
+    // Первую половину сортируем по ВОЗРАСТАНИЮ (пузырьковая)
+    bubbleSortAsc(arr, 0, mid);
+    
+    // Вторую половину сортируем по УБЫВАНИЮ (пузырьковая)
+    bubbleSortDesc(arr, mid, SIZE);
+}
+
+// 3. ПЕРЕДАЧА ПО УКАЗАТЕЛЮ
+void sortHalfAscHalfDescByPointer(array<int, SIZE>* arr) {
+    cout << "Адрес ВНУТРИ функции (указатель): " << arr << endl;
+    
+    int mid = SIZE / 2;
+    
+    // Первую половину сортируем по ВОЗРАСТАНИЮ (пузырьковая)
+    bubbleSortAsc(*arr, 0, mid);
+    
+    // Вторую половину сортируем по УБЫВАНИЮ (пузырьковая)
+    bubbleSortDesc(*arr, mid, SIZE);
+}
+
+void ShowArrayMenu(){
+    array<int, SIZE> originalArray = generateRandomArray(-10, 10);
+    
+    cout << "=== РАЗДЕЛЬНАЯ СОРТИРОВКА ПОЛОВИН МАССИВА ===" << endl;
+    cout << "Первая половина - по возрастанию, вторая - по убыванию" << endl;
+    cout << "Используется пузырьковая сортировка" << endl;
+    cout << "Размер массива: " << SIZE << " элементов" << endl;
+    cout << "Диапазон значений: [-10; 10]" << endl << endl;
+
+    // ТЕСТ 1: Передача по значению
+    cout << "1. ПЕРЕДАЧА ПО ЗНАЧЕНИЮ:" << endl;
+    cout << "=========================================" << endl;
+    
+    array<int, SIZE> array1 = originalArray;
+    printArray(array1, "Исходный массив: ");
+    cout << "Адрес СНАРУЖИ функции: " << &array1 << endl;
+    
+    array<int, SIZE> sorted1 = sortHalfAscHalfDescByValue(array1);
+    
+    printArray(array1, "Оригинальный массив после функции: ");
+    printArray(sorted1, "Возвращенный отсортированный массив: ");
+    cout << "Адрес возвращенного массива: " << &sorted1 << endl;
+// Показываем половины
+    cout << "Первая половина (возрастание): ";
+    for (int i = 0; i < SIZE / 2; i++) {
+        cout << sorted1[i] << " ";
+    }
+    cout << endl;
+    cout << "Вторая половина (убывание): ";
+    for (int i = SIZE / 2; i < SIZE; i++) {
+        cout << sorted1[i] << " ";
+    }
+    cout << endl << endl;
+
+    // ТЕСТ 2: Передача по ссылке
+    cout << "2. ПЕРЕДАЧА ПО ССЫЛКЕ:" << endl;
+    cout << "=========================================" << endl;
+    
+    array<int, SIZE> array2 = originalArray;
+    printArray(array2, "Исходный массив: ");
+    cout << "Адрес СНАРУЖИ функции: " << &array2 << endl;
+    
+    sortHalfAscHalfDescByReference(array2);
+    
+    printArray(array2, "Массив после функции: ");
+    
+    cout << "Первая половина (возрастание): ";
+    for (int i = 0; i < SIZE / 2; i++) {
+        cout << array2[i] << " ";
+    }
+    cout << endl;
+    cout << "Вторая половина (убывание): ";
+    for (int i = SIZE / 2; i < SIZE; i++) {
+        cout << array2[i] << " ";
+    }
+    cout << endl << endl;
+
+    // ТЕСТ 3: Передача по указателю
+    cout << "3. ПЕРЕДАЧА ПО УКАЗАТЕЛЮ:" << endl;
+    cout << "=========================================" << endl;
+    
+    array<int, SIZE> array3 = originalArray;
+    printArray(array3, "Исходный массив: ");
+    cout << "Адрес СНАРУЖИ функции: " << &array3 << endl;
+    
+    sortHalfAscHalfDescByPointer(&array3);
+    
+    printArray(array3, "Массив после функции: ");
+    
+    cout << "Первая половина (возрастание): ";
+    for (int i = 0; i < SIZE / 2; i++) {
+        cout << array3[i] << " ";
+    }
+    cout << endl;
+    cout << "Вторая половина (убывание): ";
+    for (int i = SIZE / 2; i < SIZE; i++) {
+        cout << array3[i] << " ";
+    }
+    cout << endl;
+
+}
+
+
 
 // ===== ГЛАВНОЕ МЕНЮ =====
+
 
 void showVectorMenu() {
     vector<int> arr;
@@ -301,80 +364,11 @@ void showVectorMenu() {
     } while (choice != 0);
 }
 
-void showArrayMenu() {
-    // Инициализация генератора случайных чисел
-    random_device rd;
-    mt19937 gen(rd());
-    uniform_int_distribution<> dis(-10, 10);
 
-    // Создание и заполнение массива случайными числами
-    array<int, ARRAY_SIZE> myArray;
-    
-    for (size_t i = 0; i < ARRAY_SIZE; ++i) {
-        myArray[i] = dis(gen);
-    }
 
-    cout << "Original array: ";
-    printStdArray(myArray);
-
-    // Демонстрация передачи по значению
-    cout << "\n--- Passing by VALUE ---" << endl;
-    cout << "Original array before call: ";
-    printStdArray(myArray);
-    array<int, ARRAY_SIZE> resultByValue = removeEvenByValue(myArray);
-    cout << "Original array after call: ";
-    printStdArray(myArray);
-    cout << "Function result (only meaningful elements): ";
-    printStdArrayMeaningful(resultByValue);
-
-    // Восстанавливаем массив для следующего теста
-    for (size_t i = 0; i < ARRAY_SIZE; ++i) {
-        myArray[i] = dis(gen);
-    }
-    cout << "\nRestored array: ";
-    printStdArray(myArray);
-
-    // Демонстрация передачи по ссылке
-    cout << "\n--- Passing by REFERENCE ---" << endl;
-    cout << "Original array before call: ";
-    printStdArray(myArray);
-    array<int, ARRAY_SIZE> resultByReference = removeEvenByReference(myArray);
-    cout << "Original array after call: ";
-    printStdArray(myArray);
-    cout << "Function result (only meaningful elements): ";
-    printStdArrayMeaningful(resultByReference);
-
-    // Восстанавливаем массив для следующего теста
-    for (size_t i = 0; i < ARRAY_SIZE; ++i) {
-        myArray[i] = dis(gen);
-    }
-    cout << "\nRestored array: ";
-    printStdArray(myArray);
-
-    // Демонстрация передачи по указателю
-    cout << "\n--- Passing by POINTER ---" << endl;
-    cout << "Original array before call: ";
-    printStdArray(myArray);
-    array<int, ARRAY_SIZE> resultByPointer = removeEvenByPointer(&myArray);
-    cout << "Original array after call: ";
-    printStdArray(myArray);
-    cout << "Function result (only meaningful elements): ";
-    printStdArrayMeaningful(resultByPointer);
-
-    // Демонстрация in-place удаления
-    cout << "\n--- IN-PLACE removal ---" << endl;
-    for (size_t i = 0; i < ARRAY_SIZE; ++i) {
-        myArray[i] = dis(gen);
-    }
-    cout << "Original array: ";
-    printStdArray(myArray);
-    size_t newSize = removeEvenInPlace(myArray);
-    cout << "Array after in-place removal: ";
-    printStdArrayWithSize(myArray, newSize);
-    cout << "New size: " << newSize << endl;
-}
 
 int main() {
+    setlocale(LC_ALL, "ru_RU.UTF-8");
     int mainChoice;
 
     do {
@@ -390,7 +384,7 @@ int main() {
                 showVectorMenu();
                 break;
             case 2:
-                showArrayMenu();
+                ShowArrayMenu();
                 break;
             case 0:
                 cout << "Exiting program." << endl;
@@ -402,7 +396,3 @@ int main() {
 
     return 0;
 }
-
-
-
-
