@@ -15,7 +15,7 @@ using namespace std;
 // Функция вывода массива
 void printArray(const vector<int>& arr) {
     if (arr.empty()) {
-        cout << "[] (empty)" << endl;
+        cout << "[] (пусто)" << endl;
         return;
     }
     
@@ -56,7 +56,7 @@ vector<size_t> findElement(const vector<int>& arr, int value) {
 // Функция вывода индексов
 void printIndices(const vector<size_t>& indices) {
     if (indices.empty()) {
-        cout << "[] (not found)" << endl;
+        cout << "[] (не найдено)" << endl;
         return;
     }
     
@@ -72,22 +72,15 @@ void printIndices(const vector<size_t>& indices) {
 bool isTriangularNumber(int K) {
     if (K <= 0) return false;
     
-    // Треугольное число n(n+1)/2 = K
-    // Решаем уравнение: n² + n - 2K = 0
-    // Дискриминант: D = 1 + 8K
-    long long discriminant = 1 + 8LL * K;  // Используем long long для больших чисел
-    
-    // Проверяем переполнение
+    long long discriminant = 1 + 8LL * K;
     if (discriminant < 0) return false;
     
     int sqrt_discriminant = sqrt(discriminant);
     
-    // Проверяем, является ли дискриминант полным квадратом
     if (sqrt_discriminant * static_cast<long long>(sqrt_discriminant) != discriminant) {
         return false;
     }
     
-    // Проверяем, является ли корень целым положительным числом
     return (sqrt_discriminant - 1) % 2 == 0 && (sqrt_discriminant - 1) / 2 > 0;
 }
 
@@ -104,43 +97,71 @@ vector<int> getTriangularTerms(int K) {
 }
 
 // Вариант 5: разбить K на сумму 1+2+3+...=K и добавить слагаемые в конец
+// ИЛИ продублировать числа на четных позициях
 void processVariant5(vector<int>& arr) {
+    if (arr.empty()) {
+        cout << "Массив пуст! Пожалуйста, добавьте элементы сначала." << endl;
+        return;
+    }
+    
     int K;
-    cout << "Enter a positive number K: ";
+    cout << "Введите положительное число K: ";
     
     if (!(cin >> K)) {
-        cout << "Invalid input! Please enter a number." << endl;
+        cout << "Неверный ввод! Пожалуйста, введите число." << endl;
         cin.clear();
         cin.ignore(numeric_limits<streamsize>::max(), '\n');
         return;
     }
 
     if (K <= 0) {
-        cout << "K must be positive!" << endl;
+        cout << "K должно быть положительным!" << endl;
         return;
     }
 
-    // Оптимизированная проверка - сразу определяем, является ли K треугольным числом
-    if (!isTriangularNumber(K)) {
-        cout << "Number " << K << " cannot be represented as sum 1+2+3+..." << endl;
-        return;
-    }
-
-    // Получаем слагаемые
-    vector<int> terms = getTriangularTerms(K);
-
-    // Выводим разложение
-    cout << "Decomposition: ";
-    for (size_t i = 0; i < terms.size(); ++i) {
-        cout << terms[i];
-        if (i < terms.size() - 1) cout << "+";
-    }
-    cout << " = " << K << endl;
-
-    // Добавляем слагаемые в конец массива
-    arr.insert(arr.end(), terms.begin(), terms.end());
-    cout << "Array after addition: ";
+    cout << "\nМассив до обработки: ";
     printArray(arr);
+
+    // Проверяем, является ли K треугольным числом
+    if (isTriangularNumber(K)) {
+        // Первое условие: можно разбить
+        cout << "\nЧисло " << K << " можно представить в виде суммы 1+2+3+..." << endl;
+        
+        // Получаем слагаемые
+        vector<int> terms = getTriangularTerms(K);
+        
+        // Выводим разложение
+        cout << "Разложение: ";
+        for (size_t i = 0; i < terms.size(); ++i) {
+            cout << terms[i];
+            if (i < terms.size() - 1) cout << "+";
+        }
+        cout << " = " << K << endl;
+
+        // Добавляем слагаемые в конец массива
+        cout << "Добавляем слагаемые в конец массива..." << endl;
+        arr.insert(arr.end(), terms.begin(), terms.end());
+        
+        cout << "Массив после добавления: ";
+        printArray(arr);
+    } else {
+        // Второе условие: иначе продублировать числа на четных позициях
+        cout << "\nЧисло " << K << " НЕЛЬЗЯ представить в виде суммы 1+2+3+..." << endl;
+        cout << "Дублируем элементы на четных позициях (индексы 0, 2, 4, ...)..." << endl;
+        
+        // Создаем новый массив с дублированием
+        vector<int> newArr;
+        for (size_t i = 0; i < arr.size(); ++i) {
+            newArr.push_back(arr[i]);  // добавляем оригинальный элемент
+            if (i % 2 == 0) {  // четные позиции (индексы 0, 2, 4...)
+                newArr.push_back(arr[i]);  // дублируем элемент на четной позиции
+            }
+        }
+        
+        arr = newArr;  // заменяем старый массив новым
+        cout << "Массив после дублирования: ";
+        printArray(arr);
+    }
 }
 
 // ===== ПУНКТ 2: РАБОТА С ARRAY =====
@@ -148,11 +169,11 @@ void processVariant5(vector<int>& arr) {
 // Константа для размера массива
 const int SIZE = 10;
 
-// Генерация случайного std::array через random_device (более современный подход)
+// Генерация случайного std::array
 array<int, SIZE> generateRandomArray(int min, int max) {
     array<int, SIZE> arr;
     
-    // Используем random_device для лучшей случайности
+    // Используем random_device для случайности
     static random_device rd;
     static mt19937 gen(rd());
     uniform_int_distribution<> dis(min, max);
@@ -166,14 +187,15 @@ array<int, SIZE> generateRandomArray(int min, int max) {
 // Вывод std::array
 void printArray(const array<int, SIZE>& arr, const string& message = "") {
     if (!message.empty()) cout << message;
+    cout << "[";
     for (int i = 0; i < SIZE; i++) {
         cout << arr[i];
         if (i < SIZE - 1) cout << ", ";
     }
-    cout << endl;
+    cout << "]" << endl;
 }
 
-// Исправленная пузырьковая сортировка по возрастанию
+// Пузырьковая сортировка по возрастанию
 void bubbleSortAsc(array<int, SIZE>& arr, int start, int end) {
     for (int i = start; i < end - 1; i++) {
         for (int j = start; j < end - 1 - (i - start); j++) {
@@ -184,7 +206,7 @@ void bubbleSortAsc(array<int, SIZE>& arr, int start, int end) {
     }
 }
 
-// Исправленная пузырьковая сортировка по убыванию
+// Пузырьковая сортировка по убыванию
 void bubbleSortDesc(array<int, SIZE>& arr, int start, int end) {
     for (int i = start; i < end - 1; i++) {
         for (int j = start; j < end - 1 - (i - start); j++) {
@@ -197,7 +219,7 @@ void bubbleSortDesc(array<int, SIZE>& arr, int start, int end) {
 
 // 1. ПЕРЕДАЧА ПО ЗНАЧЕНИЮ
 array<int, SIZE> sortHalfAscHalfDescByValue(array<int, SIZE> arr) {
-    cout << "Адрес ВНУТРИ функции (значение): " << &arr << endl;
+    cout << "Адрес ВНУТРИ функции (по значению): " << &arr << endl;
     
     int mid = SIZE / 2;
     bubbleSortAsc(arr, 0, mid);
@@ -208,7 +230,7 @@ array<int, SIZE> sortHalfAscHalfDescByValue(array<int, SIZE> arr) {
 
 // 2. ПЕРЕДАЧА ПО ССЫЛКЕ
 void sortHalfAscHalfDescByReference(array<int, SIZE>& arr) {
-    cout << "Адрес ВНУТРИ функции (ссылка): " << &arr << endl;
+    cout << "Адрес ВНУТРИ функции (по ссылке): " << &arr << endl;
     
     int mid = SIZE / 2;
     bubbleSortAsc(arr, 0, mid);
@@ -219,7 +241,7 @@ void sortHalfAscHalfDescByReference(array<int, SIZE>& arr) {
 void sortHalfAscHalfDescByPointer(array<int, SIZE>* arr) {
     if (arr == nullptr) return;
     
-    cout << "Адрес ВНУТРИ функции (указатель): " << arr << endl;
+    cout << "Адрес ВНУТРИ функции (по указателю): " << arr << endl;
     
     int mid = SIZE / 2;
     bubbleSortAsc(*arr, 0, mid);
@@ -229,7 +251,7 @@ void sortHalfAscHalfDescByPointer(array<int, SIZE>* arr) {
 void ShowArrayMenu() {
     array<int, SIZE> originalArray = generateRandomArray(-10, 10);
     
-    cout << "=== РАЗДЕЛЬНАЯ СОРТИРОВКА ПОЛОВИН МАССИВА ===" << endl;
+    cout << "\n=== РАЗДЕЛЬНАЯ СОРТИРОВКА ПОЛОВИН МАССИВА ===" << endl;
     cout << "Первая половина - по возрастанию, вторая - по убыванию" << endl;
     cout << "Используется пузырьковая сортировка" << endl;
     cout << "Размер массива: " << SIZE << " элементов" << endl;
@@ -238,10 +260,12 @@ void ShowArrayMenu() {
     // ТЕСТ 1: Передача по значению
     cout << "1. ПЕРЕДАЧА ПО ЗНАЧЕНИЮ:" << endl;
     cout << "=========================================" << endl;
+    cout << "Создается копия массива. Оригинальный массив не изменяется." << endl;
+    cout << "Функция возвращает новый отсортированный массив." << endl;
     
     array<int, SIZE> array1 = originalArray;
     printArray(array1, "Исходный массив: ");
-    cout << "Адрес СНАРУЖИ функции: " << &array1 << endl;
+    cout << "Адрес ВНЕ функции: " << &array1 << endl;
     
     array<int, SIZE> sorted1 = sortHalfAscHalfDescByValue(array1);
     
@@ -249,62 +273,122 @@ void ShowArrayMenu() {
     printArray(sorted1, "Возвращенный отсортированный массив: ");
     cout << "Адрес возвращенного массива: " << &sorted1 << endl;
     
-    cout << "Первая половина (возрастание): ";
+    cout << "Первая половина (возрастание): [";
     for (int i = 0; i < SIZE / 2; i++) {
-        cout << sorted1[i] << " ";
+        cout << sorted1[i];
+        if (i < SIZE / 2 - 1) cout << ", ";
     }
-    cout << endl;
-    cout << "Вторая половина (убывание): ";
+    cout << "]" << endl;
+    
+    cout << "Вторая половина (убывание): [";
     for (int i = SIZE / 2; i < SIZE; i++) {
-        cout << sorted1[i] << " ";
+        cout << sorted1[i];
+        if (i < SIZE - 1) cout << ", ";
     }
-    cout << endl << endl;
+    cout << "]" << endl << endl;
 
     // ТЕСТ 2: Передача по ссылке
     cout << "2. ПЕРЕДАЧА ПО ССЫЛКЕ:" << endl;
     cout << "=========================================" << endl;
+    cout << "Работает напрямую с оригинальным массивом. Изменяет его." << endl;
+    cout << "Более эффективно для больших массивов (нет копирования)." << endl;
     
     array<int, SIZE> array2 = originalArray;
     printArray(array2, "Исходный массив: ");
-    cout << "Адрес СНАРУЖИ функции: " << &array2 << endl;
+    cout << "Адрес ВНЕ функции: " << &array2 << endl;
     
     sortHalfAscHalfDescByReference(array2);
     
     printArray(array2, "Массив после функции: ");
     
-    cout << "Первая половина (возрастание): ";
+    cout << "Первая половина (возрастание): [";
     for (int i = 0; i < SIZE / 2; i++) {
-        cout << array2[i] << " ";
+        cout << array2[i];
+        if (i < SIZE / 2 - 1) cout << ", ";
     }
-    cout << endl;
-    cout << "Вторая половина (убывание): ";
+    cout << "]" << endl;
+    
+    cout << "Вторая половина (убывание): [";
     for (int i = SIZE / 2; i < SIZE; i++) {
-        cout << array2[i] << " ";
+        cout << array2[i];
+        if (i < SIZE - 1) cout << ", ";
     }
-    cout << endl << endl;
+    cout << "]" << endl << endl;
 
     // ТЕСТ 3: Передача по указателю
     cout << "3. ПЕРЕДАЧА ПО УКАЗАТЕЛЮ:" << endl;
     cout << "=========================================" << endl;
+    cout << "Аналогично передаче по ссылке, но использует синтаксис указателей." << endl;
+    cout << "Позволяет проверять на nullptr." << endl;
     
     array<int, SIZE> array3 = originalArray;
     printArray(array3, "Исходный массив: ");
-    cout << "Адрес СНАРУЖИ функции: " << &array3 << endl;
+    cout << "Адрес ВНЕ функции: " << &array3 << endl;
     
     sortHalfAscHalfDescByPointer(&array3);
     
     printArray(array3, "Массив после функции: ");
     
-    cout << "Первая половина (возрастание): ";
+    cout << "Первая половина (возрастание): [";
     for (int i = 0; i < SIZE / 2; i++) {
-        cout << array3[i] << " ";
+        cout << array3[i];
+        if (i < SIZE / 2 - 1) cout << ", ";
     }
-    cout << endl;
-    cout << "Вторая половина (убывание): ";
+    cout << "]" << endl;
+    
+    cout << "Вторая половина (убывание): [";
     for (int i = SIZE / 2; i < SIZE; i++) {
-        cout << array3[i] << " ";
+        cout << array3[i];
+        if (i < SIZE - 1) cout << ", ";
     }
-    cout << endl;
+    cout << "]" << endl;
+}
+
+// ===== ПУНКТ 3: ОБЪЯСНЕНИЕ ВЫБОРА =====
+
+void showExplanation() {
+    cout << "\n=== ПУНКТ 3: ОБЪЯСНЕНИЕ ВЫБОРА РЕАЛИЗАЦИИ ===" << endl;
+    cout << "==============================================" << endl;
+    
+    cout << "\n1. ПОЧЕМУ VECTOR В ПУНКТЕ 1?" << endl;
+    cout << "------------------------------------------------------" << endl;
+    cout << "✓ Динамический размер: может изменяться во время выполнения" << endl;
+    cout << "✓ Необходимые операции: вставка в начало, добавление в конец, очистка" << endl;
+    cout << "✓ Неизвестен конечный размер на этапе компиляции" << endl;
+    cout << "✓ Задание варианта требует добавления переменного числа слагаемых" << endl;
+    cout << "✓ Управление памятью происходит автоматически" << endl;
+    
+    cout << "\n2. ПОЧЕМУ ARRAY В ПУНКТЕ 2?" << endl;
+    cout << "------------------------------------------------------" << endl;
+    cout << "✓ Фиксированный размер: ровно 10 элементов как требуется" << endl;
+    cout << "✓ Лучшая производительность для операций с фиксированным размером" << endl;
+    cout << "✓ Демонстрирует размещение в стеке (быстрее кучи)" << endl;
+    cout << "✓ Показывает разницу между передачей по значению/ссылке/указателю" << endl;
+    cout << "✓ Проверка размера на этапе компиляции" << endl;
+    
+    cout << "\n3. КОГДА ОНИ ВЗАИМОЗАМЕНЯЕМЫ?" << endl;
+    cout << "------------------------------------------------------" << endl;
+    cout << "✓ Когда размер известен на этапе компиляции И не изменяется" << endl;
+    cout << "✓ Когда критически важна максимальная производительность" << endl;
+    cout << "✓ При работе с устаревшим кодом или библиотеками на C" << endl;
+    
+    cout << "\n4. КЛЮЧЕВЫЕ РАЗЛИЧИЯ:" << endl;
+    cout << "------------------------------------------------------" << endl;
+    cout << "VECTOR:                                 ARRAY:" << endl;
+    cout << "- Динамический размер                  - Фиксированный размер" << endl;
+    cout << "- Выделение в куче                    - Выделение в стеке" << endl;
+    cout << "- Можно изменять размер               - Нельзя изменять размер" << endl;
+    cout << "- Немного медленнее                   - Немного быстрее" << endl;
+    cout << "- Более гибкий                        - Более предсказуемый" << endl;
+    
+    cout << "\n5. ВЫВОД И ВЫБОР:" << endl;
+    cout << "------------------------------------------------------" << endl;
+    cout << "Выбор между vector и array зависит от требований задачи:" << endl;
+    cout << "- Используйте vector, когда размер изменяется или неизвестен заранее" << endl;
+    cout << "- Используйте array, когда размер фиксирован и известен на этапе компиляции" << endl;
+    cout << "- В данной работе выбор был обусловлен спецификой каждого пункта:" << endl;
+    cout << "  * Пункт 1 требует динамических операций → vector" << endl;
+    cout << "  * Пункт 2 работает с фиксированным массивом → array" << endl;
 }
 
 void showVectorMenu() {
@@ -312,19 +396,21 @@ void showVectorMenu() {
     int choice;
 
     do {
-        cout << "\n=== WORKING WITH VECTOR (PART 1) ===" << endl;
-        cout << "Current array size: " << arr.size() << endl;
-        cout << "0. Exit to main menu" << endl;
-        cout << "1. View array" << endl;
-        cout << "2. Add element to beginning" << endl;
-        cout << "3. Add element to end" << endl;
-        cout << "4. Clear entire array" << endl;
-        cout << "5. Search element in array" << endl;
-        cout << "6. Variant task (variant 5 - to end)" << endl;
-        cout << "Select action (0-6): ";
+        cout << "\n=== РАБОТА С VECTOR (ПУНКТ 1) ===" << endl;
+        cout << "Текущий массив: ";
+        printArray(arr);
+        cout << "Размер: " << arr.size() << " элементов" << endl;
+        cout << "0. Выход в главное меню" << endl;
+        cout << "1. Просмотр массива" << endl;
+        cout << "2. Добавить элемент в начало" << endl;
+        cout << "3. Добавить элемент в конец" << endl;
+        cout << "4. Очистить весь массив" << endl;
+        cout << "5. Поиск элемента в массиве" << endl;
+        cout << "6. Задание варианта (вариант 5)" << endl;
+        cout << "Выберите действие (0-6): ";
         
         if (!(cin >> choice)) {
-            cout << "Invalid input! Please enter a number." << endl;
+            cout << "Неверный ввод! Пожалуйста, введите число." << endl;
             cin.clear();
             cin.ignore(numeric_limits<streamsize>::max(), '\n');
             continue;
@@ -332,57 +418,61 @@ void showVectorMenu() {
 
         switch (choice) {
             case 0:
-                cout << "Return to main menu." << endl;
+                cout << "Возврат в главное меню." << endl;
                 break;
             case 1:
-                cout << "Current array: ";
+                cout << "Текущий массив: ";
                 printArray(arr);
                 break;
             case 2: {
                 int value;
-                cout << "Enter value to add to beginning: ";
+                cout << "Введите значение для добавления в начало: ";
                 if (!(cin >> value)) {
-                    cout << "Invalid input!" << endl;
+                    cout << "Неверный ввод!" << endl;
                     cin.clear();
                     cin.ignore(numeric_limits<streamsize>::max(), '\n');
                     break;
                 }
                 addToBegin(arr, value);
-                cout << "Element added to beginning." << endl;
+                cout << "Элемент добавлен в начало." << endl;
+                cout << "Массив: ";
+                printArray(arr);
                 break;
             }
             case 3: {
                 int value;
-                cout << "Enter value to add to end: ";
+                cout << "Введите значение для добавления в конец: ";
                 if (!(cin >> value)) {
-                    cout << "Invalid input!" << endl;
+                    cout << "Неверный ввод!" << endl;
                     cin.clear();
                     cin.ignore(numeric_limits<streamsize>::max(), '\n');
                     break;
                 }
                 addToEnd(arr, value);
-                cout << "Element added to end." << endl;
+                cout << "Элемент добавлен в конец." << endl;
+                cout << "Массив: ";
+                printArray(arr);
                 break;
             }
             case 4:
                 clearArray(arr);
-                cout << "Array cleared." << endl;
+                cout << "Массив очищен." << endl;
                 break;
             case 5: {
                 if (arr.empty()) {
-                    cout << "Array is empty. Nothing to search." << endl;
+                    cout << "Массив пуст. Нечего искать." << endl;
                     break;
                 }
                 int value;
-                cout << "Enter value to search: ";
+                cout << "Введите значение для поиска: ";
                 if (!(cin >> value)) {
-                    cout << "Invalid input!" << endl;
+                    cout << "Неверный ввод!" << endl;
                     cin.clear();
                     cin.ignore(numeric_limits<streamsize>::max(), '\n');
                     break;
                 }
                 vector<size_t> indices = findElement(arr, value);
-                cout << "Indices of found elements: ";
+                cout << "Индексы найденных элементов: ";
                 printIndices(indices);
                 break;
             }
@@ -390,7 +480,7 @@ void showVectorMenu() {
                 processVariant5(arr);
                 break;
             default:
-                cout << "Invalid choice. Try again." << endl;
+                cout << "Неверный выбор. Попробуйте снова." << endl;
         }
     } while (choice != 0);
 }
@@ -400,14 +490,15 @@ int main() {
     int mainChoice;
 
     do {
-        cout << "\n=== MAIN MENU ===" << endl;
-        cout << "1. Part 1 - working with vector" << endl;
-        cout << "2. Part 2 - working with array" << endl;
-        cout << "0. Exit program" << endl;
-        cout << "Select section: ";
+        cout << "\n=== ГЛАВНОЕ МЕНЮ ===" << endl;
+        cout << "1. Пункт 1 - работа с vector" << endl;
+        cout << "2. Пункт 2 - работа с array" << endl;
+        cout << "3. Пункт 3 - объяснение выбора реализации" << endl;
+        cout << "0. Выход из программы" << endl;
+        cout << "Выберите раздел: ";
         
         if (!(cin >> mainChoice)) {
-            cout << "Invalid input! Please enter a number." << endl;
+            cout << "Неверный ввод! Пожалуйста, введите число." << endl;
             cin.clear();
             cin.ignore(numeric_limits<streamsize>::max(), '\n');
             continue;
@@ -420,11 +511,14 @@ int main() {
             case 2:
                 ShowArrayMenu();
                 break;
+            case 3:
+                showExplanation();
+                break;
             case 0:
-                cout << "Exiting program." << endl;
+                cout << "Выход из программы." << endl;
                 break;
             default:
-                cout << "Invalid choice. Try again." << endl;
+                cout << "Неверный выбор. Попробуйте снова." << endl;
         }
     } while (mainChoice != 0);
 
