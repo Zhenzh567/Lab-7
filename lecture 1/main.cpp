@@ -1,3 +1,5 @@
+#pragma execution_character_set("utf-8")
+
 #include <iostream>
 #include <vector>
 #include <array>
@@ -7,12 +9,12 @@
 #include <ctime>
 #include <locale>
 #include <limits>
+#include <windows.h>
 
 using namespace std;
 
 // ===== ПУНКТ 1: РАБОТА С VECTOR =====
 
-// Функция вывода массива
 void printArray(const vector<int>& arr) {
     if (arr.empty()) {
         cout << "[] (пусто)" << endl;
@@ -27,22 +29,18 @@ void printArray(const vector<int>& arr) {
     cout << "]" << endl;
 }
 
-// Функция добавления элемента в начало
 void addToBegin(vector<int>& arr, int value) {
     arr.insert(arr.begin(), value);
 }
 
-// Функция добавления элемента в конец
 void addToEnd(vector<int>& arr, int value) {
     arr.push_back(value);
 }
 
-// Функция очистки массива
 void clearArray(vector<int>& arr) {
     arr.clear();
 }
 
-// Функция поиска элемента (возвращает индексы)
 vector<size_t> findElement(const vector<int>& arr, int value) {
     vector<size_t> indices;
     for (size_t i = 0; i < arr.size(); ++i) {
@@ -53,7 +51,6 @@ vector<size_t> findElement(const vector<int>& arr, int value) {
     return indices;
 }
 
-// Функция вывода индексов
 void printIndices(const vector<size_t>& indices) {
     if (indices.empty()) {
         cout << "[] (не найдено)" << endl;
@@ -68,26 +65,26 @@ void printIndices(const vector<size_t>& indices) {
     cout << "]" << endl;
 }
 
-// Оптимизированная функция проверки треугольного числа
 bool isTriangularNumber(int K) {
     if (K <= 0) return false;
     
-    long long discriminant = 1 + 8LL * K;
+    long long discriminant = 1 + 8LL * static_cast<long long>(K);
     if (discriminant < 0) return false;
     
-    int sqrt_discriminant = sqrt(discriminant);
+    // Явное приведение типа
+    long long sqrt_discriminant = static_cast<long long>(sqrt(static_cast<double>(discriminant)));
     
-    if (sqrt_discriminant * static_cast<long long>(sqrt_discriminant) != discriminant) {
+    if (sqrt_discriminant * sqrt_discriminant != discriminant) {
         return false;
     }
     
     return (sqrt_discriminant - 1) % 2 == 0 && (sqrt_discriminant - 1) / 2 > 0;
 }
 
-// Функция получения треугольных слагаемых
 vector<int> getTriangularTerms(int K) {
     vector<int> terms;
-    int n = (sqrt(1 + 8LL * K) - 1) / 2;
+    // Явное приведение типа
+    int n = static_cast<int>((sqrt(1.0 + 8.0 * static_cast<double>(K)) - 1.0) / 2.0);
     
     for (int i = 1; i <= n; ++i) {
         terms.push_back(i);
@@ -96,8 +93,6 @@ vector<int> getTriangularTerms(int K) {
     return terms;
 }
 
-// Вариант 5: разбить K на сумму 1+2+3+...=K и добавить слагаемые в конец
-// ИЛИ продублировать числа на четных позициях
 void processVariant5(vector<int>& arr) {
     if (arr.empty()) {
         cout << "Массив пуст! Пожалуйста, добавьте элементы сначала." << endl;
@@ -122,15 +117,11 @@ void processVariant5(vector<int>& arr) {
     cout << "\nМассив до обработки: ";
     printArray(arr);
 
-    // Проверяем, является ли K треугольным числом
     if (isTriangularNumber(K)) {
-        // Первое условие: можно разбить
         cout << "\nЧисло " << K << " можно представить в виде суммы 1+2+3+..." << endl;
         
-        // Получаем слагаемые
         vector<int> terms = getTriangularTerms(K);
         
-        // Выводим разложение
         cout << "Разложение: ";
         for (size_t i = 0; i < terms.size(); ++i) {
             cout << terms[i];
@@ -138,27 +129,24 @@ void processVariant5(vector<int>& arr) {
         }
         cout << " = " << K << endl;
 
-        // Добавляем слагаемые в конец массива
         cout << "Добавляем слагаемые в конец массива..." << endl;
         arr.insert(arr.end(), terms.begin(), terms.end());
         
         cout << "Массив после добавления: ";
         printArray(arr);
     } else {
-        // Второе условие: иначе продублировать числа на четных позициях
         cout << "\nЧисло " << K << " НЕЛЬЗЯ представить в виде суммы 1+2+3+..." << endl;
         cout << "Дублируем элементы на четных позициях (индексы 0, 2, 4, ...)..." << endl;
         
-        // Создаем новый массив с дублированием
         vector<int> newArr;
         for (size_t i = 0; i < arr.size(); ++i) {
-            newArr.push_back(arr[i]);  // добавляем оригинальный элемент
-            if (i % 2 == 0) {  // четные позиции (индексы 0, 2, 4...)
-                newArr.push_back(arr[i]);  // дублируем элемент на четной позиции
+            newArr.push_back(arr[i]);
+            if (i % 2 == 0) {
+                newArr.push_back(arr[i]);
             }
         }
         
-        arr = newArr;  // заменяем старый массив новым
+        arr = newArr;
         cout << "Массив после дублирования: ";
         printArray(arr);
     }
@@ -166,14 +154,11 @@ void processVariant5(vector<int>& arr) {
 
 // ===== ПУНКТ 2: РАБОТА С ARRAY =====
 
-// Константа для размера массива
 const int SIZE = 10;
 
-// Генерация случайного std::array
 array<int, SIZE> generateRandomArray(int min, int max) {
     array<int, SIZE> arr;
     
-    // Используем random_device для случайности
     static random_device rd;
     static mt19937 gen(rd());
     uniform_int_distribution<> dis(min, max);
@@ -184,7 +169,6 @@ array<int, SIZE> generateRandomArray(int min, int max) {
     return arr;
 }
 
-// Вывод std::array
 void printArray(const array<int, SIZE>& arr, const string& message = "") {
     if (!message.empty()) cout << message;
     cout << "[";
@@ -195,10 +179,12 @@ void printArray(const array<int, SIZE>& arr, const string& message = "") {
     cout << "]" << endl;
 }
 
-// Пузырьковая сортировка по возрастанию
+// Исправленные функции сортировки с явными приведениями типов
 void bubbleSortAsc(array<int, SIZE>& arr, int start, int end) {
     for (int i = start; i < end - 1; i++) {
-        for (int j = start; j < end - 1 - (i - start); j++) {
+        // Явное приведение к int для избежания сравнения signed/unsigned
+        int iterations = end - 1 - (i - start);
+        for (int j = start; j < iterations; j++) {
             if (arr[j] > arr[j + 1]) {
                 swap(arr[j], arr[j + 1]);
             }
@@ -206,10 +192,10 @@ void bubbleSortAsc(array<int, SIZE>& arr, int start, int end) {
     }
 }
 
-// Пузырьковая сортировка по убыванию
 void bubbleSortDesc(array<int, SIZE>& arr, int start, int end) {
     for (int i = start; i < end - 1; i++) {
-        for (int j = start; j < end - 1 - (i - start); j++) {
+        int iterations = end - 1 - (i - start);
+        for (int j = start; j < iterations; j++) {
             if (arr[j] < arr[j + 1]) {
                 swap(arr[j], arr[j + 1]);
             }
@@ -217,7 +203,6 @@ void bubbleSortDesc(array<int, SIZE>& arr, int start, int end) {
     }
 }
 
-// 1. ПЕРЕДАЧА ПО ЗНАЧЕНИЮ
 array<int, SIZE> sortHalfAscHalfDescByValue(array<int, SIZE> arr) {
     cout << "Адрес ВНУТРИ функции (по значению): " << &arr << endl;
     
@@ -228,7 +213,6 @@ array<int, SIZE> sortHalfAscHalfDescByValue(array<int, SIZE> arr) {
     return arr;
 }
 
-// 2. ПЕРЕДАЧА ПО ССЫЛКЕ
 void sortHalfAscHalfDescByReference(array<int, SIZE>& arr) {
     cout << "Адрес ВНУТРИ функции (по ссылке): " << &arr << endl;
     
@@ -237,7 +221,6 @@ void sortHalfAscHalfDescByReference(array<int, SIZE>& arr) {
     bubbleSortDesc(arr, mid, SIZE);
 }
 
-// 3. ПЕРЕДАЧА ПО УКАЗАТЕЛЮ
 void sortHalfAscHalfDescByPointer(array<int, SIZE>* arr) {
     if (arr == nullptr) return;
     
@@ -344,8 +327,6 @@ void ShowArrayMenu() {
     cout << "]" << endl;
 }
 
-// ===== ПУНКТ 3: ОБЪЯСНЕНИЕ ВЫБОРА =====
-
 void showExplanation() {
     cout << "\n=== ПУНКТ 3: ОБЪЯСНЕНИЕ ВЫБОРА РЕАЛИЗАЦИИ ===" << endl;
     cout << "==============================================" << endl;
@@ -362,7 +343,7 @@ void showExplanation() {
     cout << "------------------------------------------------------" << endl;
     cout << "✓ Фиксированный размер: ровно 10 элементов как требуется" << endl;
     cout << "✓ Лучшая производительность для операций с фиксированным размером" << endl;
-    cout << "✓ Демонстрирует размещение в стеке (быстрее кучи)" << endl;
+    cout << "✓ Демонстрирует размерование в стеке (быстрее кучи)" << endl;
     cout << "✓ Показывает разницу между передачей по значению/ссылке/указателю" << endl;
     cout << "✓ Проверка размера на этапе компиляции" << endl;
     
@@ -486,7 +467,11 @@ void showVectorMenu() {
 }
 
 int main() {
-    setlocale(LC_ALL, "ru_RU.UTF-8");
+    // Установка кодировки для Windows
+    SetConsoleOutputCP(1251);
+    SetConsoleCP(1251);
+    setlocale(LC_ALL, "Russian");
+    
     int mainChoice;
 
     do {
@@ -521,286 +506,6 @@ int main() {
                 cout << "Неверный выбор. Попробуйте снова." << endl;
         }
     } while (mainChoice != 0);
-
-    return 0;
-}
-#include <iostream>
-#include <string>
-#include <vector>
-#include <limits>
-#include <locale>
-
-struct Person {
-    std::string name;
-    int age;
-    int friend_index;
-};
-
-Person* getFriend(int person_index, std::vector<Person>& Journal) {
-    // Проверяем корректность индексов
-    if (person_index >= 0 && person_index < static_cast<int>(Journal.size())) {
-        int friend_index = Journal[person_index].friend_index;
-        if (friend_index >= 0 && friend_index < static_cast<int>(Journal.size())) {
-            return &Journal[friend_index];
-        }
-    }
-    return nullptr;
-}
-
-void showallpeople(std::vector<Person>& Journal) {
-    std::cout << "=== ВСЕ ЛЮДИ В ЖУРНАЛЕ ===" << std::endl;
-    for (size_t i = 0; i < Journal.size(); ++i) {
-        std::cout << i + 1 << ". " << Journal[i].name << " (" << Journal[i].age << " лет)";
-        Person* friend_ptr = getFriend(static_cast<int>(i), Journal);
-        if (friend_ptr) {
-            std::cout << " -> " << friend_ptr->name << " (" << friend_ptr->age << " лет)";
-        } else {
-            std::cout << " -> интроверт";
-        }
-        std::cout << std::endl;
-    }
-}
-
-void showintroverts(const std::vector<Person>& Journal) {
-    std::cout << "=== ИНТРОВЕРТЫ ===" << std::endl;
-    bool found = false;
-    for (size_t i = 0; i < Journal.size(); ++i) {
-        if (Journal[i].friend_index == -1) {
-            std::cout << Journal[i].name << " (" << Journal[i].age << " лет)" << std::endl;
-            found = true;
-        }
-    }
-    if (!found) {
-        std::cout << "Интровертов нет" << std::endl;
-    }
-}
-
-void showverybestfriends(std::vector<Person>& Journal) {
-    std::cout << "=== VERY BEST FRIENDS ===" << std::endl;
-    bool found = false;
-    for (size_t i = 0; i < Journal.size(); ++i) {
-        Person* friend_ptr = getFriend(static_cast<int>(i), Journal);
-        if (friend_ptr) {
-            int friend_index = Journal[i].friend_index;
-            if (friend_index >= 0 && friend_index < static_cast<int>(Journal.size())) {
-                if (Journal[friend_index].friend_index == static_cast<int>(i)) {
-                    if (static_cast<int>(i) < friend_index) {  // Чтобы не выводить пары дважды
-                        std::cout << Journal[i].name << " (" << Journal[i].age << " лет) <-> " 
-                                  << friend_ptr->name << " (" << friend_ptr->age << " лет)" << std::endl;
-                        found = true;
-                    }
-                }
-            }
-        }
-    }
-    if (!found) {
-        std::cout << "Пар very best friends нет" << std::endl;
-    }
-}
-
-void secret(std::vector<Person>& Journal) {
-    std::string name;
-    std::cout << "От кого начинаем: ";
-    std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
-    getline(std::cin, name);
-    
-    int current_index = -1;
-    for (size_t i = 0; i < Journal.size(); ++i) {
-        if (Journal[i].name == name) {
-            current_index = static_cast<int>(i);
-            break;
-        }
-    }
-    
-    if (current_index == -1) {
-        std::cout << "Человек не найден" << std::endl;
-        return;
-    }
-    
-    std::cout << "Цепочка секрета: ";
-    // Используем вектор вместо массива фиксированного размера
-    std::vector<bool> visited(Journal.size(), false);
-    int current = current_index;
-    bool first = true;
-    
-    while (current != -1 && !visited[current]) {
-        visited[current] = true;
-        if (!first) {
-            std::cout << " -> ";
-        }
-        std::cout << Journal[current].name << " (" << Journal[current].age << " лет)";
-        first = false;
-        
-        int next_index = Journal[current].friend_index;
-        if (next_index != -1 && next_index < static_cast<int>(Journal.size()) && !visited[next_index]) {
-            current = next_index;
-        } else {
-            current = -1;
-        }
-    }
-    std::cout << std::endl;
-}
-
-bool PersonExits(const std::string& name, const std::vector<Person>& Journal) {
-    for (size_t i = 0; i < Journal.size(); ++i) {
-        if (Journal[i].name == name) {
-            return true;
-        }
-    }
-    return false;
-}
-
-void addNeWperson(std::vector<Person>& Journal) {
-    std::string name;
-    int age;
-    
-    std::cout << "\n=== ДОБАВЛЕНИЕ НОВОГО ЧЕЛОВЕКА ===" << std::endl;
-    std::cout << "Введите имя нового человека: ";
-    std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
-    getline(std::cin, name);
-    
-    if (PersonExits(name, Journal)) {
-        std::cout << "ОШИБКА. Такой человек уже существует в журнале" << std::endl;
-        return;
-    }
-    
-    std::cout << "Введите возраст нового человека: ";
-    if (!(std::cin >> age)) {
-        std::cout << "Ошибка ввода возраста!" << std::endl;
-        std::cin.clear();
-        std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
-        return;
-    }
-    
-    if (age < 0 || age > 150) {
-        std::cout << "ОШИБКА. Некорректный возраст!" << std::endl;
-        return;
-    }
-    
-    // Спросим, интроверт ли человек
-    char isIntrovert;
-    std::cout << "Этот человек интроверт? (y/n): ";
-    std::cin >> isIntrovert;
-    
-    Person new_person;
-    new_person.name = name;
-    new_person.age = age;
-    
-    if (isIntrovert == 'y' || isIntrovert == 'Y') {
-        // Если интроверт
-        new_person.friend_index = -1;
-        Journal.push_back(new_person);
-        std::cout << "Добавлен интроверт: " << name << " (" << age << " лет)" << std::endl;
-    } else if (isIntrovert == 'n' || isIntrovert == 'N') {
-        // Если не интроверт, нужно выбрать друга
-        if (Journal.empty()) {
-            std::cout << "В журнале нет людей, которых можно выбрать в друзья. " 
-                      << name << " будет добавлен как интроверт." << std::endl;
-            new_person.friend_index = -1;
-            Journal.push_back(new_person);
-        } else {
-            // Покажем список людей для выбора друга
-            std::cout << "\nДоступные люди для дружбы:" << std::endl;
-            for (size_t i = 0; i < Journal.size(); ++i) {
-                std::cout << i + 1 << ". " << Journal[i].name 
-                          << " (" << Journal[i].age << " лет)";
-                Person* friend_ptr = getFriend(static_cast<int>(i), Journal);
-                if (friend_ptr) {
-                    std::cout << " -> друг: " << friend_ptr->name;
-                } else {
-                    std::cout << " -> интроверт";
-                }
-                std::cout << std::endl;
-            }
-            
-            int friend_choice;
-            std::cout << "\nВыберите номер друга для " << name << " (1-" << Journal.size() << "): ";
-            if (!(std::cin >> friend_choice)) {
-                std::cout << "Ошибка ввода!" << std::endl;
-                std::cin.clear();
-                std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
-                return;
-            }
-            
-            if (friend_choice < 1 || friend_choice > static_cast<int>(Journal.size())) {
-                std::cout << "Неверный выбор! " << name << " будет добавлен как интроверт." << std::endl;
-                new_person.friend_index = -1;
-            } else {
-                // Вычитаем 1, потому что пользователь видит номера с 1
-                new_person.friend_index = friend_choice - 1;
-                std::cout << name << " теперь друг " << Journal[new_person.friend_index].name << std::endl;
-            }
-            
-            Journal.push_back(new_person);
-            std::cout << "Добавлен: " << name << " (" << age << " лет)" << std::endl;
-        }
-    } else {
-        std::cout << "Неверный ввод! " << name << " будет добавлен как интроверт." << std::endl;
-        new_person.friend_index = -1;
-        Journal.push_back(new_person);
-    }
-}
-
-void showMenu() {
-    std::cout << "\n=== МЕНЮ ===" << std::endl;
-    std::cout << "1. Просмотр всех людей" << std::endl;
-    std::cout << "2. Цепочка секрета" << std::endl;
-    std::cout << "3. Показать интровертов" << std::endl;
-    std::cout << "4. Very best friends" << std::endl;
-    std::cout << "5. Создание нового элемента" << std::endl;
-    std::cout << "0. Выход" << std::endl;
-    std::cout << "Выберите пункт: ";
-}
-
-int main() {
-    setlocale(LC_ALL, "ru_RU.UTF-8");
-    
-    std::vector<Person> journal = { 
-        {"Vanya", 25, 1},
-        {"Petya", 30, 2},
-        {"Vova", 22, 0},
-        {"Sergey", 28, 4},
-        {"eVGENIY", 35, 3},
-        {"Aleksey", 19, 2},
-        {"Masha", 24, -1},
-        {"Elena", 27, -1}
-    };
-    
-    int choice;
-    do {
-        showMenu();
-        
-        if (!(std::cin >> choice)) {
-            std::cout << "Ошибка ввода! Пожалуйста, введите число." << std::endl;
-            std::cin.clear();
-            std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
-            continue;
-        }
-        
-        switch(choice) {
-            case 1:
-                showallpeople(journal);
-                break;
-            case 2:
-                secret(journal);
-                break;
-            case 3:
-                showintroverts(journal);
-                break;
-            case 4:
-                showverybestfriends(journal);
-                break;
-            case 5:
-                addNeWperson(journal);
-                break;
-            case 0:
-                std::cout << "Выход из программы." << std::endl;
-                break;
-            default:
-                std::cout << "Выбран неверный пункт меню" << std::endl;
-                break;
-        }
-    } while (choice != 0);
 
     return 0;
 }
