@@ -71,7 +71,6 @@ bool isTriangularNumber(int K) {
     long long discriminant = 1 + 8LL * static_cast<long long>(K);
     if (discriminant < 0) return false;
     
-    // Явное приведение типа
     long long sqrt_discriminant = static_cast<long long>(sqrt(static_cast<double>(discriminant)));
     
     if (sqrt_discriminant * sqrt_discriminant != discriminant) {
@@ -83,7 +82,6 @@ bool isTriangularNumber(int K) {
 
 vector<int> getTriangularTerms(int K) {
     vector<int> terms;
-    // Явное приведение типа
     int n = static_cast<int>((sqrt(1.0 + 8.0 * static_cast<double>(K)) - 1.0) / 2.0);
     
     for (int i = 1; i <= n; ++i) {
@@ -154,37 +152,36 @@ void processVariant5(vector<int>& arr) {
 
 // ===== ПУНКТ 2: РАБОТА С ARRAY =====
 
-const int SIZE = 10;
+const int ARRAY_SIZE = 10;  // Изменили имя с SIZE на ARRAY_SIZE
 
-array<int, SIZE> generateRandomArray(int min, int max) {
-    array<int, SIZE> arr;
+array<int, ARRAY_SIZE> generateRandomArray(int min, int max) {
+    array<int, ARRAY_SIZE> arr;
     
     static random_device rd;
     static mt19937 gen(rd());
     uniform_int_distribution<> dis(min, max);
     
-    for (int i = 0; i < SIZE; i++) {
+    for (int i = 0; i < ARRAY_SIZE; i++) {
         arr[i] = dis(gen);
     }
     return arr;
 }
 
-void printArray(const array<int, SIZE>& arr, const string& message = "") {
+void printArray(const array<int, ARRAY_SIZE>& arr, const string& message = "") {
     if (!message.empty()) cout << message;
     cout << "[";
-    for (int i = 0; i < SIZE; i++) {
+    for (int i = 0; i < ARRAY_SIZE; i++) {
         cout << arr[i];
-        if (i < SIZE - 1) cout << ", ";
+        if (i < ARRAY_SIZE - 1) cout << ", ";
     }
     cout << "]" << endl;
 }
 
-// Исправленные функции сортировки с явными приведениями типов
-void bubbleSortAsc(array<int, SIZE>& arr, int start, int end) {
-    for (int i = start; i < end - 1; i++) {
-        // Явное приведение к int для избежания сравнения signed/unsigned
-        int iterations = end - 1 - (i - start);
-        for (int j = start; j < iterations; j++) {
+// Исправленные функции сортировки - изменили имена параметров
+void bubbleSortAsc(array<int, ARRAY_SIZE>& arr, int start_idx, int end_idx) {
+    for (int i = start_idx; i < end_idx - 1; i++) {
+        int iterations = end_idx - 1 - (i - start_idx);
+        for (int j = start_idx; j < iterations; j++) {
             if (arr[j] > arr[j + 1]) {
                 swap(arr[j], arr[j + 1]);
             }
@@ -192,10 +189,10 @@ void bubbleSortAsc(array<int, SIZE>& arr, int start, int end) {
     }
 }
 
-void bubbleSortDesc(array<int, SIZE>& arr, int start, int end) {
-    for (int i = start; i < end - 1; i++) {
-        int iterations = end - 1 - (i - start);
-        for (int j = start; j < iterations; j++) {
+void bubbleSortDesc(array<int, ARRAY_SIZE>& arr, int start_idx, int end_idx) {
+    for (int i = start_idx; i < end_idx - 1; i++) {
+        int iterations = end_idx - 1 - (i - start_idx);
+        for (int j = start_idx; j < iterations; j++) {
             if (arr[j] < arr[j + 1]) {
                 swap(arr[j], arr[j + 1]);
             }
@@ -203,41 +200,41 @@ void bubbleSortDesc(array<int, SIZE>& arr, int start, int end) {
     }
 }
 
-array<int, SIZE> sortHalfAscHalfDescByValue(array<int, SIZE> arr) {
+array<int, ARRAY_SIZE> sortHalfAscHalfDescByValue(array<int, ARRAY_SIZE> arr) {
     cout << "Адрес ВНУТРИ функции (по значению): " << &arr << endl;
     
-    int mid = SIZE / 2;
+    int mid = ARRAY_SIZE / 2;
     bubbleSortAsc(arr, 0, mid);
-    bubbleSortDesc(arr, mid, SIZE);
+    bubbleSortDesc(arr, mid, ARRAY_SIZE);
     
     return arr;
 }
 
-void sortHalfAscHalfDescByReference(array<int, SIZE>& arr) {
+void sortHalfAscHalfDescByReference(array<int, ARRAY_SIZE>& arr) {
     cout << "Адрес ВНУТРИ функции (по ссылке): " << &arr << endl;
     
-    int mid = SIZE / 2;
+    int mid = ARRAY_SIZE / 2;
     bubbleSortAsc(arr, 0, mid);
-    bubbleSortDesc(arr, mid, SIZE);
+    bubbleSortDesc(arr, mid, ARRAY_SIZE);
 }
 
-void sortHalfAscHalfDescByPointer(array<int, SIZE>* arr) {
+void sortHalfAscHalfDescByPointer(array<int, ARRAY_SIZE>* arr) {
     if (arr == nullptr) return;
     
     cout << "Адрес ВНУТРИ функции (по указателю): " << arr << endl;
     
-    int mid = SIZE / 2;
+    int mid = ARRAY_SIZE / 2;
     bubbleSortAsc(*arr, 0, mid);
-    bubbleSortDesc(*arr, mid, SIZE);
+    bubbleSortDesc(*arr, mid, ARRAY_SIZE);
 }
 
 void ShowArrayMenu() {
-    array<int, SIZE> originalArray = generateRandomArray(-10, 10);
+    array<int, ARRAY_SIZE> originalArray = generateRandomArray(-10, 10);
     
     cout << "\n=== РАЗДЕЛЬНАЯ СОРТИРОВКА ПОЛОВИН МАССИВА ===" << endl;
     cout << "Первая половина - по возрастанию, вторая - по убыванию" << endl;
     cout << "Используется пузырьковая сортировка" << endl;
-    cout << "Размер массива: " << SIZE << " элементов" << endl;
+    cout << "Размер массива: " << ARRAY_SIZE << " элементов" << endl;
     cout << "Диапазон значений: [-10; 10]" << endl << endl;
 
     // ТЕСТ 1: Передача по значению
@@ -246,27 +243,27 @@ void ShowArrayMenu() {
     cout << "Создается копия массива. Оригинальный массив не изменяется." << endl;
     cout << "Функция возвращает новый отсортированный массив." << endl;
     
-    array<int, SIZE> array1 = originalArray;
+    array<int, ARRAY_SIZE> array1 = originalArray;
     printArray(array1, "Исходный массив: ");
     cout << "Адрес ВНЕ функции: " << &array1 << endl;
     
-    array<int, SIZE> sorted1 = sortHalfAscHalfDescByValue(array1);
+    array<int, ARRAY_SIZE> sorted1 = sortHalfAscHalfDescByValue(array1);
     
     printArray(array1, "Оригинальный массив после функции: ");
     printArray(sorted1, "Возвращенный отсортированный массив: ");
     cout << "Адрес возвращенного массива: " << &sorted1 << endl;
     
     cout << "Первая половина (возрастание): [";
-    for (int i = 0; i < SIZE / 2; i++) {
+    for (int i = 0; i < ARRAY_SIZE / 2; i++) {
         cout << sorted1[i];
-        if (i < SIZE / 2 - 1) cout << ", ";
+        if (i < ARRAY_SIZE / 2 - 1) cout << ", ";
     }
     cout << "]" << endl;
     
     cout << "Вторая половина (убывание): [";
-    for (int i = SIZE / 2; i < SIZE; i++) {
+    for (int i = ARRAY_SIZE / 2; i < ARRAY_SIZE; i++) {
         cout << sorted1[i];
-        if (i < SIZE - 1) cout << ", ";
+        if (i < ARRAY_SIZE - 1) cout << ", ";
     }
     cout << "]" << endl << endl;
 
@@ -276,7 +273,7 @@ void ShowArrayMenu() {
     cout << "Работает напрямую с оригинальным массивом. Изменяет его." << endl;
     cout << "Более эффективно для больших массивов (нет копирования)." << endl;
     
-    array<int, SIZE> array2 = originalArray;
+    array<int, ARRAY_SIZE> array2 = originalArray;
     printArray(array2, "Исходный массив: ");
     cout << "Адрес ВНЕ функции: " << &array2 << endl;
     
@@ -285,16 +282,16 @@ void ShowArrayMenu() {
     printArray(array2, "Массив после функции: ");
     
     cout << "Первая половина (возрастание): [";
-    for (int i = 0; i < SIZE / 2; i++) {
+    for (int i = 0; i < ARRAY_SIZE / 2; i++) {
         cout << array2[i];
-        if (i < SIZE / 2 - 1) cout << ", ";
+        if (i < ARRAY_SIZE / 2 - 1) cout << ", ";
     }
     cout << "]" << endl;
     
     cout << "Вторая половина (убывание): [";
-    for (int i = SIZE / 2; i < SIZE; i++) {
+    for (int i = ARRAY_SIZE / 2; i < ARRAY_SIZE; i++) {
         cout << array2[i];
-        if (i < SIZE - 1) cout << ", ";
+        if (i < ARRAY_SIZE - 1) cout << ", ";
     }
     cout << "]" << endl << endl;
 
@@ -304,7 +301,7 @@ void ShowArrayMenu() {
     cout << "Аналогично передаче по ссылке, но использует синтаксис указателей." << endl;
     cout << "Позволяет проверять на nullptr." << endl;
     
-    array<int, SIZE> array3 = originalArray;
+    array<int, ARRAY_SIZE> array3 = originalArray;
     printArray(array3, "Исходный массив: ");
     cout << "Адрес ВНЕ функции: " << &array3 << endl;
     
@@ -313,16 +310,16 @@ void ShowArrayMenu() {
     printArray(array3, "Массив после функции: ");
     
     cout << "Первая половина (возрастание): [";
-    for (int i = 0; i < SIZE / 2; i++) {
+    for (int i = 0; i < ARRAY_SIZE / 2; i++) {
         cout << array3[i];
-        if (i < SIZE / 2 - 1) cout << ", ";
+        if (i < ARRAY_SIZE / 2 - 1) cout << ", ";
     }
     cout << "]" << endl;
     
     cout << "Вторая половина (убывание): [";
-    for (int i = SIZE / 2; i < SIZE; i++) {
+    for (int i = ARRAY_SIZE / 2; i < ARRAY_SIZE; i++) {
         cout << array3[i];
-        if (i < SIZE - 1) cout << ", ";
+        if (i < ARRAY_SIZE - 1) cout << ", ";
     }
     cout << "]" << endl;
 }
